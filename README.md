@@ -2,7 +2,7 @@
 
 SmartFill uses an ESP32, an HC-SR04 ultrasonic sensor, an OLED, indicator LEDs, a buzzer, and a relay to monitor a tank and control its pump. Level measurement and pump safety run on the ESP32. Wi-Fi is used to send readings to the SmartFill server and receive remote commands; automatic control continues locally when the network is unavailable.
 
-> **Wiring note:** The supplied `connection.png` is a component-level reference, but some of its GPIO routes differ from the current firmware. Use the pin table below and in the [connection guide](connection.html) as the source of truth when wiring this sketch. Do not copy a diagram route where it conflicts with the table.
+> **Wiring note:** The supplied `connection.png` is a component-level reference, but some of its GPIO routes differ from the current firmware. Use the pin table below and in the [connection guide](https://hi-iamat.github.io/SmartFill_2.0/connection.html) as the source of truth when wiring this sketch. Do not copy a diagram route where it conflicts with the table.
 
 ## Project files
 
