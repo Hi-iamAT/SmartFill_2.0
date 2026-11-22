@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SmartFill 2.0 ESP32 water monitor and pump controller wiring guide.">
+  <title>SmartFill 2.0 — Connection Guide</title>
+  <style>
+    :root { color-scheme: light; --ink:#163047; --muted:#526779; --blue:#087e8b; --line:#d8e3e9; --wash:#f3f8fa; --warn:#fff5df; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#eef4f6; color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1040px; margin:32px auto; padding:clamp(20px,4vw,44px); background:#fff; border-radius:18px; box-shadow:0 12px 40px #17344812; }
+    h1,h2,h3 { line-height:1.2; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,3rem); }
+    h2 { margin-top:38px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+    h3 { margin-top:24px; }
+    p,li { color:var(--muted); }
+    a { color:#006d7c; }
+    .lead { font-size:1.1rem; max-width:70ch; }
+    .callout { padding:16px 18px; border-left:5px solid #d39216; border-radius:8px; background:var(--warn); }
+    .figure { margin:24px 0; padding:12px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+    .figure img { display:block; width:100%; height:auto; }
+    figcaption { padding:10px 4px 2px; color:var(--muted); font-size:.9rem; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; margin:14px 0; }
+    th,td { padding:11px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:var(--wash); color:var(--ink); }
+    code { padding:2px 5px; background:var(--wash); border-radius:4px; color:#173d55; }
+    .steps li { margin:9px 0; }
+    footer { margin-top:38px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.9rem; }
+    @media (max-width:600px) { main { margin:0; border-radius:0; } th,td { padding:9px 8px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SmartFill 2.0 connection guide</h1>
+    <p class="lead">Wiring and first-power-up instructions for the ESP32 water-level monitor and automatic pump controller. Keep this page open alongside <a href="README.md">the project README</a>.</p>
+  </header>
+
+  <p class="callout"><strong>Important diagram note:</strong> <code>connection.png</code> is the supplied component/layout illustration. Its visible GPIO routes do not consistently match the current firmware. Use the pin assignments in this page and <code>water_meter/water_meter.ino</code>. The supplied picture also illustrates a battery, charger, and buck converter that are not configured by the firmware; power design must be selected for the actual ESP32 board, sensor, relay, and pump.</p>
+
+  <figure class="figure">
+    <a href="connection.png"><img src="connection.png" alt="Supplied SmartFill wiring illustration showing ESP32, ultrasonic sensor, OLED, LEDs, buttons, buzzer driver, relay, pump, and battery power components"></a>
+    <figcaption>Supplied connection illustration. Click to open the full-resolution image. Use the firmware pin table below wherever the pictured GPIO routes differ.</figcaption>
+  </figure>
+
+  <h2>Current firmware pin map</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Part / signal</th><th>ESP32 connection</th><th>Connection details</th></tr></thead>
+    <tbody>
+      <tr><td>HC-SR04 VCC</td><td>Regulated 5 V</td><td>Use a suitable 5 V supply. Do not assume the ESP32 3V3 pin can power the sensor.</td></tr>
+      <tr><td>HC-SR04 GND</td><td>Common GND</td><td>Ground must be common with the ESP32 for the signal reference.</td></tr>
+      <tr><td>HC-SR04 TRIG</td><td>GPIO 5</td><td>ESP32 GPIO output to the sensor TRIG input.</td></tr>
+      <tr><td>HC-SR04 ECHO</td><td>GPIO 18 through divider</td><td>Never feed a 5 V ECHO signal directly into an ESP32 GPIO.</td></tr>
+      <tr><td>SSD1306 OLED SDA</td><td>GPIO 21</td><td>I²C data; firmware uses address <code>0x3C</code>.</td></tr>
+      <tr><td>SSD1306 OLED SCL</td><td>GPIO 22</td><td>I²C clock. Connect module power and ground according to its specification.</td></tr>
+      <tr><td>Green LED</td><td>GPIO 15</td><td>GPIO → individual 220–330 Ω resistor → LED anode; cathode → GND.</td></tr>
+      <tr><td>Blue LED</td><td>GPIO 16</td><td>Same series-resistor arrangement as the green LED.</td></tr>
+      <tr><td>Red LED</td><td>GPIO 17</td><td>Same series-resistor arrangement as the green LED.</td></tr>
+      <tr><td>Active buzzer driver</td><td>GPIO 23 to NPN base through 10 kΩ</td><td>Use an NPN transistor stage: emitter to GND, collector to buzzer negative, buzzer positive to its rated supply. Share ground. Add a flyback diode if the buzzer is inductive. Firmware sets GPIO HIGH for ON.</td></tr>
+      <tr><td>OK button</td><td>GPIO 32 to GND</td><td>Momentary normally-open button. Internal pull-up is enabled; no external pull-up is needed.</td></tr>
+      <tr><td>RESET button</td><td>GPIO 33 to GND</td><td>Momentary normally-open button. Short press cancels manual ON; hold for 2.5 s to clear calibration.</td></tr>
+      <tr><td>Relay module IN</td><td>GPIO 19</td><td>Current firmware has <code>RELAY_ACTIVE_LOW = false</code> (HIGH means relay/pump request ON). Verify the module’s input compatibility and actual behavior with the pump disconnected.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>HC-SR04 ECHO voltage divider</h2>
+  <p>For a typical 5 V HC-SR04, place a divider between ECHO and GPIO 18. One common arrangement uses 10 kΩ from ECHO to the GPIO node and 20 kΩ from the GPIO node to GND. This reduces a nominal 5 V echo to about 3.3 V.</p>
+  <p><code>HC-SR04 ECHO → 10 kΩ → GPIO 18 node → 20 kΩ → GND</code></p>
+  <p>Connect the GPIO 18 node to the ESP32 ECHO input. Confirm resistor values and sensor output voltage for the exact parts you have.</p>
+
+  <h2>Power and pump wiring</h2>
+  <ol class="steps">
+    <li>Power the ESP32 board through its supported USB or regulated input. Provide regulated power for the sensor, display, buzzer, and relay module according to each module’s voltage requirements.</li>
+    <li>Do not power the pump from the ESP32 or a GPIO. Use a separate supply rated for the pump voltage and startup current.</li>
+    <li>Route pump current through relay <strong>COM</strong> and <strong>NO</strong> contacts for a normally-off load. Connect the pump supply and pump only on the correctly rated relay contact circuit. Observe DC polarity or AC wiring requirements as applicable.</li>
+    <li>Check relay contact ratings against the pump’s motor load, including inrush current. Add appropriate fuse protection and use an enclosure, insulation, and strain relief.</li>
+    <li>Share low-voltage ground between ESP32, sensor, and driver/module circuits where required. Follow the relay module’s isolation design; never bridge isolated grounds casually.</li>
+    <li>Keep mains wiring physically separated from low-voltage electronics. Mains-side installation should be handled by a qualified person.</li>
+  </ol>
+  <p class="callout"><strong>Relay logic check:</strong> The current source sets <code>RELAY_ACTIVE_LOW = false</code>, while many relay boards are active-low. Board behavior varies. With the pump disconnected, power the ESP32 and verify the relay is de-energized at boot and responds in the intended direction. Change the firmware constant only after confirming the module’s logic.</p>
+
+  <h2>Mounting and tank calibration</h2>
+  <ol class="steps">
+    <li>Mount the HC-SR04 level and securely above the maximum safe water line, pointing down at the water. Avoid a position where the beam hits a wall, brace, pipe, or turbulent inlet.</li>
+    <li>Keep the water surface farther from the sensor than the HC-SR04 blind zone. The sketch’s <code>SENSOR_TO_RIM_OFFSET_CM</code> is 6 cm; update it if the installed sensor-to-safe-fill distance differs.</li>
+    <li>With the tank empty and the sensor in its final position, power the controller. Press OK to begin calibration, then press OK a second time when prompted to save the measured empty distance. The value is stored and persists across reboot.</li>
+    <li>Recalibrate if the sensor position or tank geometry changes. Check displayed level against a known fill amount before enabling pump control.</li>
+  </ol>
+
+  <h2>Before connecting the pump</h2>
+  <ol class="steps">
+    <li>Inspect for shorts and confirm common ground and supply polarity.</li>
+    <li>Flash the firmware and open Serial Monitor at 115200 baud. Confirm the OLED, sensor readings, calibration, and Wi-Fi state.</li>
+    <li>Keep the pump disconnected. Verify relay OFF at boot and test the relay state using its indicator or a multimeter.</li>
+    <li>Confirm local AUTO behavior: it requests pump ON at or below 10% and OFF at 50%. Local invalid-sensor, missing-calibration, 50% level, and 15-minute runtime safeguards stop the pump.</li>
+    <li>Only connect the pump after relay polarity, contact wiring, supply rating, fuse, and enclosure have been checked.</li>
+  </ol>
+
+  <h2>Firmware behavior that affects connections</h2>
+  <ul>
+    <li>The relay output is GPIO 19, and the pump is forced OFF during boot.</li>
+    <li>The three LEDs are GPIO 15, 16, and 17; they require separate current-limiting resistors.</li>
+    <li>The buttons are active-low inputs on GPIO 32 and 33 because the firmware enables <code>INPUT_PULLUP</code>.</li>
+    <li>The buzzer output is GPIO 23; the project sketch expects a transistor driver, not a high-current buzzer connected directly to the GPIO.</li>
+    <li>The sensor is sampled every second. Server readings are uploaded on the configured interval (30 seconds by default), and remote commands are polled every 5 seconds while connected.</li>
+  </ul>
+  <footer>SmartFill 2.0 · Pin assignments are taken from <code>water_meter/water_meter.ino</code>. Review the actual module datasheets and electrical ratings before assembly.</footer>
+</main>
+</body>
+</html>
