@@ -49,7 +49,14 @@
     </div>
     <p class="notice"><strong>Wiring:</strong> The supplied diagram is a visual component reference. Follow the current firmware pin map in the connection guide where routes differ.</p>
     <h2>Prototype photos</h2>
-    <img class="photo" src="assets/image-4.jpeg" alt="SmartFill ESP32 prototype with sensor wiring">
+    <figure>
+      <img class="photo" src="assets/illustrations/system-overview.svg" alt="SmartFill system: tank sensing, ESP32 control, pump relay, and HydroLevel dashboard">
+      <figcaption>Readings and pump safeguards run locally on the ESP32. HydroLevel adds remote monitoring and commands when Wi-Fi is available.</figcaption>
+    </figure>
+    <h2>Automatic pump thresholds</h2>
+    <img class="photo" src="assets/illustrations/auto-control.svg" alt="Pump starts at or below 10 percent and stops at 50 percent">
+    <h2>Prototype</h2>
+    <img class="photo" src="assets/photos/image-4.jpeg" alt="SmartFill ESP32 prototype with sensor wiring">
     <footer><p>SmartFill 2.0 project guide. For GPIO mapping, power requirements, calibration, and safety, use the <a href="connection.html">connection guide</a>.</p></footer>
   </main>
 </body>

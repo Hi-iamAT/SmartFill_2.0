@@ -2,9 +2,9 @@
 
 <p align="center">
   <strong>Smart water monitoring · ESP32 pump automation · HydroLevel connectivity</strong><br>
-  <a href="https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/connection.html">🌐 Open the connection guide</a>
-  · <a href="https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/device-setup.html">🔌 HydroLevel API setup</a>
-  · <a href="https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/connection.png">🖼️ Wiring diagram</a>
+  <a href="https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/docs/connection.html">🌐 Open the connection guide</a>
+  · <a href="https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/docs/device-setup.html">🔌 HydroLevel API setup</a>
+  · <a href="docs/connection.png">🖼️ Wiring diagram</a>
 </p>
 
 <p align="center">
@@ -19,19 +19,20 @@
 
 SmartFill uses an ESP32, an HC-SR04 ultrasonic sensor, an OLED, indicator LEDs, a buzzer, and a relay to monitor a tank and control its pump. Level measurement and pump safety run on the ESP32. Wi-Fi is used to send readings to the SmartFill server and receive remote commands; automatic control continues locally when the network is unavailable.
 
+<p align="center"><img src="docs/assets/illustrations/system-overview.svg" alt="SmartFill system illustration: tank sensor to ESP32, local relay and pump, and HydroLevel cloud" width="100%"></p>
+
 
 > [!WARNING]
-> The supplied `connection.png` is a component-level reference, but some GPIO routes differ from the current firmware. Use the pin table below and in the [rendered connection guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/connection.html) as the source of truth when wiring this sketch.
+> The supplied diagram is a component-level reference, but some GPIO routes differ from the current firmware. Use the pin table below and in the [rendered connection guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/docs/connection.html) as the source of truth when wiring this sketch.
 
 ## 📁 Project files
 
 - `water_meter/water_meter.ino` — ESP32 firmware.
 - `water_meter/secrets.h.example` — configuration template; copy it to `water_meter/secrets.h` and enter credentials.
-- `connection.png` — supplied wiring illustration.
-- `connection.html` — detailed connection instructions and diagram.
-- `device-setup.html` — rendered HydroLevel device registration and API connection guide.
-- `index.html` — project website landing page.
-- `assets/image-1.jpeg` … `assets/image-5.jpeg` — project build photos.
+- `docs/` — website landing page, wiring guide, API guide, and supplied connection diagram.
+- `docs/assets/illustrations/` — original system overview and pump-control illustrations.
+- `docs/assets/photos/` — prototype build photos.
+- `water_meter/` — ESP32 firmware and safe-to-copy secrets template.
 
 ## 📸 Build photos
 
@@ -39,11 +40,11 @@ These photos document the prototype assembly and powered operation. They are vis
 
 | Prototype assembly | Prototype assembly | Powered indicators |
 |---|---|---|
-| ![SmartFill prototype assembly, photo 1](assets/image-1.jpeg) | ![SmartFill prototype assembly, photo 2](assets/image-2.jpeg) | ![SmartFill powered prototype](assets/image-5.jpeg) |
+| ![SmartFill prototype assembly, photo 1](docs/assets/photos/image-1.jpeg) | ![SmartFill prototype assembly, photo 2](docs/assets/photos/image-2.jpeg) | ![SmartFill powered prototype](docs/assets/photos/image-5.jpeg) |
 
 | Sensor and controller wiring | Prototype wiring detail |
 |---|---|
-| ![SmartFill wiring detail, photo 3](assets/image-3.jpeg) | ![SmartFill wiring detail, photo 4](assets/image-4.jpeg) |
+| ![SmartFill wiring detail, photo 3](docs/assets/photos/image-3.jpeg) | ![SmartFill wiring detail, photo 4](docs/assets/photos/image-4.jpeg) |
 
 ## ⚙️ What it does
 
@@ -62,13 +63,15 @@ The OLED shows calibration status, level percentage, water height, free space, W
 
 The current implementation has one 50% local stop threshold for both AUTO and MANUAL. The remote settings adjust the display/alarm thresholds and upload interval; they do not change the firmware’s 10% AUTO start, 50% stop, or 15-minute runtime safety limits.
 
+![SmartFill automatic pump control illustration showing 10% start and 50% stop](docs/assets/illustrations/auto-control.svg)
+
 ### Server communication
 
 When online, the ESP32 posts readings to `/api/readings` (default interval 30 seconds) and polls `/api/device-command` every 5 seconds. The reading includes sensor measurements, Wi-Fi signal strength, firmware version, control mode, and pump state. Remote commands are requested by the device and still pass through local safety checks before the relay changes.
 
 ## 🔧 Wiring and connections
 
-Open the [rendered SmartFill connection guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/connection.html) for the supplied diagram, pin-by-pin table, power guidance, and first power-up sequence.
+Open the [rendered SmartFill connection guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/docs/connection.html) for the supplied diagram, pin-by-pin table, power guidance, and first power-up sequence.
 
 | Device | ESP32 connection | Notes |
 |---|---|---|
@@ -96,7 +99,7 @@ The sketch’s exact pin definitions are at the top of `water_meter/water_meter.
 
 The firmware communicates with `https://hydrolevel.vercel.app` over HTTPS using the device API key. Create the device in HydroLevel first; the ESP32 does not create or register its own device.
 
-1. Follow the [rendered HydroLevel device setup guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/device-setup.html), then open the HydroLevel website and go to **Devices**. Create/register a device for this ESP32 and copy its device code and API key when shown. The API key may only be shown once; keep it private.
+1. Follow the [rendered HydroLevel device setup guide](https://htmlpreview.github.io/?https://github.com/Hi-iamAT/SmartFill_2.0/blob/main/docs/device-setup.html), then open the HydroLevel website and go to **Devices**. Create/register a device for this ESP32 and copy its device code and API key when shown. The API key may only be shown once; keep it private.
 2. Copy `water_meter/secrets.h.example` to `water_meter/secrets.h` and set:
 
    ```cpp
@@ -137,9 +140,9 @@ The current firmware uses `tls.setInsecure()`, so it does not verify the HydroLe
 
 ## 🌍 Publish the project website
 
-The repository includes a GitHub Actions workflow that publishes the static guide files to GitHub Pages when changes are pushed to `main` or `master`. In the GitHub repository, open **Settings → Pages** and set the build/deployment source to **GitHub Actions**. Push the project to the repository and wait for the **Publish SmartFill guide** workflow to finish. Then the site is at `https://hi-iamat.github.io/SmartFill_2.0/`, the wiring page is at `https://hi-iamat.github.io/SmartFill_2.0/connection.html`, and the device/API guide is at `https://hi-iamat.github.io/SmartFill_2.0/device-setup.html`.
+The repository includes a GitHub Actions workflow that publishes `docs/` and the public visual assets to GitHub Pages when documentation changes are pushed to `main`. In the repository, open **Settings → Pages** and set the build/deployment source to **GitHub Actions**. Push the project and wait for the **Publish SmartFill guide** workflow to finish. Then the site is at `https://hi-iamat.github.io/SmartFill_2.0/`, the wiring page is at `https://hi-iamat.github.io/SmartFill_2.0/connection.html`, and the device/API guide is at `https://hi-iamat.github.io/SmartFill_2.0/device-setup.html`.
 
-The workflow publishes only the HTML pages, README, diagram, and build photos; it does not publish the firmware or `secrets.h`.
+The workflow publishes only the HTML pages, connection diagram, and public assets; it does not publish the firmware or private `secrets.h`.
 
 ## Calibration and measurement notes
 

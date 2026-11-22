@@ -35,7 +35,8 @@
 <main>
   <header>
     <h1>SmartFill 2.0 connection guide</h1>
-    <p class="lead">Wiring and first-power-up instructions for the ESP32 water-level monitor and automatic pump controller. Keep this page open alongside <a href="README.md">the project README</a>.</p>
+    <p><a href="index.html">← SmartFill project site</a></p>
+    <p class="lead">Wiring and first-power-up instructions for the ESP32 water-level monitor and automatic pump controller. See also the <a href="https://github.com/Hi-iamAT/SmartFill_2.0#readme">project README</a> and <a href="device-setup.html">HydroLevel device setup guide</a>.</p>
   </header>
 
   <p class="callout"><strong>Important diagram note:</strong> <code>connection.png</code> is the supplied component/layout illustration. Its visible GPIO routes do not consistently match the current firmware. Use the pin assignments in this page and <code>water_meter/water_meter.ino</code>. The supplied picture also illustrates a battery, charger, and buck converter that are not configured by the firmware; power design must be selected for the actual ESP32 board, sensor, relay, and pump.</p>
@@ -43,6 +44,11 @@
   <figure class="figure">
     <a href="connection.png"><img src="connection.png" alt="Supplied SmartFill wiring illustration showing ESP32, ultrasonic sensor, OLED, LEDs, buttons, buzzer driver, relay, pump, and battery power components"></a>
     <figcaption>Supplied connection illustration. Click to open the full-resolution image. Use the firmware pin table below wherever the pictured GPIO routes differ.</figcaption>
+  </figure>
+
+  <figure class="figure">
+    <img src="assets/illustrations/system-overview.svg" alt="System overview from ultrasonic sensor through ESP32 to pump relay and HydroLevel">
+    <figcaption>System architecture overview. This is a functional illustration; use the wiring image above and the pin table below for physical connections.</figcaption>
   </figure>
 
   <h2>Current firmware pin map</h2>
@@ -92,6 +98,10 @@
   </ol>
 
   <h2>Before connecting the pump</h2>
+  <figure class="figure">
+    <img src="assets/illustrations/auto-control.svg" alt="Automatic pump start at or below 10 percent and stop at 50 percent">
+    <figcaption>Automatic mode uses a 10% start threshold and a 50% stop threshold.</figcaption>
+  </figure>
   <ol class="steps">
     <li>Inspect for shorts and confirm common ground and supply polarity.</li>
     <li>Flash the firmware and open Serial Monitor at 115200 baud. Confirm the OLED, sensor readings, calibration, and Wi-Fi state.</li>

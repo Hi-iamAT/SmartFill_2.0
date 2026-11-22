@@ -1,0 +1,14 @@
+# Local-only device credentials
+water_meter/secrets.h
+
+# Arduino and PlatformIO build products
+build/
+.pio/
+*.bin
+*.elf
+*.map
+
+# Editor and operating system files
+.DS_Store
+Thumbs.db
+.vscode/

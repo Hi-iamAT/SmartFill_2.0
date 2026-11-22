@@ -1,26 +1,29 @@
 /*
   SmartFill 2.0 - ESP32 DevKit V1
-  Hardware mapping follows the supplied wiring diagram.
+  Hardware mapping follows the current firmware pin map in this file.
+  The supplied connection diagram is a visual reference and some of its
+  GPIO routes do not match this sketch; use docs/connection.html.
 
   GPIO map:
     HC-SR04 TRIG  5       HC-SR04 ECHO 18 (through voltage divider)
     OLED SDA     21       OLED SCL     22 (SSD1306 I2C, address 0x3C)
     Buzzer       23       (2N2222 transistor driver; GPIO HIGH = buzzer ON)
-    Green LED    25       Blue LED     26       Red LED 27
+    Green LED    15       Blue LED     16       Red LED 17
     OK button    32       RESET button 33 (buttons to GND, INPUT_PULLUP)
-    Relay IN     19       (relay module; active-low by default)
+    Relay IN     19       (RELAY_ACTIVE_LOW is false by default)
 
   Required libraries:
     - Adafruit GFX Library
     - Adafruit SSD1306
     - ArduinoJson 7.x
 
-  Create secrets.h beside this sketch; see secrets.example.h.
+  Copy secrets.h.example to secrets.h beside this sketch and fill in
+  the Wi-Fi and registered HydroLevel device credentials.
 
   Safety:
     - Pump is commanded OFF during boot.
-    - Pump stops for invalid sensor, uncalibrated container, >=90%,
-      or maximum continuous runtime.
+    - Pump stops for invalid sensor, missing calibration, >=50%,
+      or 15 minutes of continuous runtime.
     - AUTO thresholds are evaluated locally and work without Wi-Fi.
     - MANUAL ON expires if the device cannot contact the server.
 */

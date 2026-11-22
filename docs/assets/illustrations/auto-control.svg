@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 340" role="img" aria-labelledby="title desc">
+  <title id="title">SmartFill automatic pump control thresholds</title>
+  <desc id="desc">A tank level scale from zero to one hundred percent. The pump starts at or below ten percent and stops at fifty percent. The pump stays off above ten percent and starts again only when the level falls to ten percent or lower.</desc>
+  <defs>
+    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#19a887"/><stop offset="1" stop-color="#36b9ba"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-40%" width="140%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#143c51" flood-opacity=".13"/></filter>
+  </defs>
+  <rect width="1000" height="340" rx="24" fill="#f0f7f7"/>
+  <text x="48" y="53" fill="#163b50" font-family="system-ui,sans-serif" font-size="15" font-weight="700" letter-spacing="2">LOCAL AUTO CONTROL · HYSTERESIS</text>
+  <text x="48" y="83" fill="#547284" font-family="system-ui,sans-serif" font-size="15">The ESP32 decides from its measured level; cloud access is not required.</text>
+  <g filter="url(#shadow)"><rect x="64" y="128" width="872" height="38" rx="19" fill="#dce8eb"/></g>
+  <path d="M83 128h68v38H83q-19 0-19-19t19-19z" fill="#119a7d"/>
+  <path d="M151 128h349v38H151z" fill="url(#fill)"/>
+  <path d="M500 128h417q19 0 19 19t-19 19H500z" fill="#dce8eb"/>
+  <line x1="151" y1="115" x2="151" y2="184" stroke="#087968" stroke-width="3"/>
+  <line x1="500" y1="115" x2="500" y2="184" stroke="#b96a24" stroke-width="3"/>
+  <text x="151" y="208" text-anchor="middle" fill="#087968" font-family="system-ui,sans-serif" font-size="17" font-weight="700">10%</text>
+  <text x="500" y="208" text-anchor="middle" fill="#a55c21" font-family="system-ui,sans-serif" font-size="17" font-weight="700">50%</text>
+  <text x="64" y="207" fill="#708b98" font-family="system-ui,sans-serif" font-size="13">0%</text>
+  <text x="936" y="207" text-anchor="end" fill="#708b98" font-family="system-ui,sans-serif" font-size="13">100%</text>
+  <rect x="64" y="241" width="420" height="62" rx="13" fill="#e1f6ef"/>
+  <circle cx="95" cy="272" r="15" fill="#119a7d"/>
+  <path d="M88 272h14m-7-7 7 7-7 7" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="123" y="267" fill="#17614f" font-family="system-ui,sans-serif" font-size="15" font-weight="700">At or below 10% · pump starts</text>
+  <text x="123" y="288" fill="#528074" font-family="system-ui,sans-serif" font-size="12">Runs while the level remains below 50%.</text>
+  <rect x="516" y="241" width="420" height="62" rx="13" fill="#fff0df"/>
+  <circle cx="547" cy="272" r="15" fill="#d18436"/>
+  <path d="M541 266l12 12m0-12-12 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="575" y="267" fill="#80501f" font-family="system-ui,sans-serif" font-size="15" font-weight="700">At or above 50% · pump stops</text>
+  <text x="575" y="288" fill="#92744f" font-family="system-ui,sans-serif" font-size="12">It stays off until the level falls to 10% or lower.</text>
+</svg>
