@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Register a SmartFill ESP32 device and connect it to the HydroLevel API.">
+  <title>SmartFill — HydroLevel Device Setup</title>
+  <style>
+    :root { color-scheme:light; --ink:#163047; --muted:#526779; --blue:#087e8b; --line:#d8e3e9; --wash:#f3f8fa; --warn:#fff5df; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#eef4f6; color:var(--ink); font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:900px; margin:32px auto; padding:clamp(20px,4vw,44px); background:#fff; border-radius:18px; box-shadow:0 12px 40px #17344812; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,3rem); line-height:1.15; }
+    h2 { margin-top:36px; padding-bottom:9px; border-bottom:1px solid var(--line); }
+    p,li { color:var(--muted); }
+    a { color:#006d7c; }
+    code,pre { background:var(--wash); color:#173d55; }
+    code { padding:2px 5px; border-radius:4px; }
+    pre { overflow:auto; padding:16px; border:1px solid var(--line); border-radius:9px; }
+    pre code { padding:0; }
+    .notice { padding:16px 18px; border-left:5px solid #d39216; border-radius:8px; background:var(--warn); }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; margin:14px 0; }
+    th,td { padding:11px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:var(--wash); }
+    footer { margin-top:38px; border-top:1px solid var(--line); padding-top:18px; color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body><main>
+  <p><a href="index.html">← SmartFill project site</a></p>
+  <h1>Connect ESP32 to HydroLevel</h1>
+  <p>Register the device in HydroLevel, place its device code and API key in the ESP32 secrets file, then flash the firmware. The ESP32 sends readings and polls for commands over HTTPS.</p>
+
+  <p class="notice"><strong>Keep the API key private.</strong> HydroLevel device keys identify and authorize a device. Do not publish the real <code>secrets.h</code>, key screenshots, or logs containing the key. The repository includes only <code>secrets.h.example</code>.</p>
+
+  <h2>1. Register the device in HydroLevel</h2>
+  <ol>
+    <li>Open <a href="https://hydrolevel.vercel.app">HydroLevel</a> and sign in to the account that manages the installation.</li>
+    <li>Go to its <strong>Devices</strong> page and create/register an ESP32 device. Give it a recognizable name and select the tank/container if the interface asks.</li>
+    <li>Copy the generated <strong>device code</strong> and <strong>device API key</strong>. Store the key securely; if the site displays it only once, save it before leaving the page.</li>
+  </ol>
+  <p>The current repository contains the device firmware, not HydroLevel's server implementation. The names and exact buttons in the Devices page can change; use the device code and key provided by the live HydroLevel interface.</p>
+
+  <h2>2. Configure the ESP32</h2>
+  <ol>
+    <li>Make a local copy of <code>water_meter/secrets.h.example</code> named <code>water_meter/secrets.h</code>.</li>
+    <li>Fill in the Wi-Fi network and registered device credentials:</li>
+  </ol>
+  <pre><code>#define WIFI_SSID        "YOUR_WIFI_NAME"
+#define WIFI_PASSWORD    "YOUR_WIFI_PASSWORD"
+#define SERVER_URL       "https://hydrolevel.vercel.app"
+#define DEVICE_CODE      "ESP32_CODE_FROM_HYDROLEVEL"
+#define DEVICE_API_KEY   "API_KEY_FROM_HYDROLEVEL"
+#define FIRMWARE_VERSION "2.0.0"</code></pre>
+  <p>Keep the server URL without a trailing slash. Install ArduinoJson 7, Adafruit GFX, and Adafruit SSD1306. Compile and flash <code>water_meter/water_meter.ino</code> for the correct ESP32 board. Open Serial Monitor at 115200 baud.</p>
+
+  <h2>3. What the firmware sends</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Request</th><th>Authentication</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST /api/readings</code></td><td><code>X-API-Key</code></td><td>Upload measured distance, level, sensor validity, firmware version, Wi-Fi RSSI, pump state, control mode, and runtime. Default interval is 30 seconds and can be updated by server configuration.</td></tr>
+      <tr><td><code>GET /api/device-command?device_code=…</code></td><td><code>X-API-Key</code>; optionally <code>X-Command-Updated-At</code></td><td>Poll the current AUTO/MANUAL mode and pump command about every 5 seconds.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The reading body includes <code>device_code</code>, <code>distance_cm</code>, <code>water_height_cm</code>, <code>water_level_percent</code>, <code>free_space_cm</code>, <code>sensor_valid</code>, <code>firmware_version</code>, <code>wifi_rssi</code>, <code>pump_status</code>, <code>control_mode</code>, and <code>pump_runtime_seconds</code>. It may also include <code>container_id</code> once known.</p>
+  <pre><code>{
+  "device_code": "ESP32_XXXX",
+  "distance_cm": 28.4,
+  "water_height_cm": 42.1,
+  "water_level_percent": 59.8,
+  "free_space_cm": 22.4,
+  "sensor_valid": true,
+  "firmware_version": "2.0.0",
+  "wifi_rssi": -53,
+  "pump_status": false,
+  "control_mode": "AUTO",
+  "pump_runtime_seconds": 0
+}</code></pre>
+
+  <h2>4. Verify readings and command control</h2>
+  <ol>
+    <li>On boot, confirm Serial Monitor reports Wi-Fi connected. Check HydroLevel's device view for new readings after the upload interval.</li>
+    <li>Calibrate with the tank empty: press OK to begin, then press OK again at the save prompt.</li>
+    <li>With the pump physically disconnected, verify AUTO behavior and relay direction. AUTO starts at/below 10% and stops at 50% using local sensor data.</li>
+    <li>For website control, choose MANUAL in HydroLevel and request ON or OFF. The web app stores a command; the device polls and applies it subject to its local safety rules.</li>
+  </ol>
+
+  <h2>Offline behavior and safety</h2>
+  <ul>
+    <li>AUTO control is local and does not require HydroLevel or Wi-Fi.</li>
+    <li>MANUAL ON stops if no successful command poll arrives for 30 seconds.</li>
+    <li>The relay is commanded OFF at boot and on invalid sensor readings, missing calibration, a level at or above 50%, or continuous runtime of 15 minutes.</li>
+    <li>Firmware currently uses <code>tls.setInsecure()</code>, which skips TLS certificate validation. Configure trusted certificate validation before using this on an untrusted network.</li>
+  </ul>
+  <footer><a href="connection.html">Open wiring and connection guide</a> · <a href="https://hydrolevel.vercel.app">HydroLevel</a></footer>
+</main></body>
+</html>

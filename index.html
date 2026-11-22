@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SmartFill 2.0 smart water monitoring and automatic pump controller project guide.">
+  <title>SmartFill 2.0 — Water Monitoring</title>
+  <style>
+    :root { color-scheme:light; --ink:#163047; --muted:#587080; --blue:#087e8b; --aqua:#dff7f2; --line:#d8e7e9; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#f1f7f8; font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header { padding:clamp(30px,7vw,82px) 22px; color:white; background:linear-gradient(125deg,#0d334b,#087e8b 68%,#15a69a); }
+    .hero,.content { width:min(1040px,100%); margin:auto; }
+    .eyebrow { letter-spacing:.14em; text-transform:uppercase; font-size:.8rem; opacity:.85; }
+    h1 { max-width:760px; margin:8px 0 12px; font-size:clamp(2.4rem,7vw,4.5rem); line-height:1.06; }
+    header p { max-width:680px; color:#e2f5f4; font-size:1.12rem; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+    .button { display:inline-block; padding:11px 17px; border-radius:9px; background:white; color:#075565; font-weight:700; text-decoration:none; }
+    .button.secondary { border:1px solid #c2e6e5; background:transparent; color:white; }
+    .content { padding:28px 22px 56px; }
+    h2 { margin:34px 0 10px; line-height:1.2; }
+    p { color:var(--muted); }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:20px 0; }
+    .card { padding:20px; border:1px solid var(--line); border-radius:14px; background:white; }
+    .card h3 { margin:0 0 8px; }
+    .card p { margin:0; }
+    .photo { width:100%; height:auto; display:block; border-radius:14px; border:1px solid var(--line); }
+    .notice { padding:15px 18px; border-radius:10px; background:var(--aqua); color:#1e565c; }
+    footer { border-top:1px solid var(--line); padding-top:20px; color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <header><div class="hero">
+    <div class="eyebrow">ESP32 · Water monitoring · Pump automation</div>
+    <h1>Know your water level. Control your pump safely.</h1>
+    <p>SmartFill 2.0 measures tank level locally, shows status on an OLED, and can report readings to HydroLevel. Automatic pump control and safety checks run on the ESP32.</p>
+    <nav class="actions" aria-label="Project guides">
+      <a class="button" href="connection.html">Open connection guide</a>
+      <a class="button secondary" href="device-setup.html">HydroLevel device and API setup</a>
+      <a class="button secondary" href="connection.png">View wiring diagram</a>
+    </nav>
+  </div></header>
+  <main class="content">
+    <h2>Project at a glance</h2>
+    <div class="cards">
+      <article class="card"><h3>Measure</h3><p>Five ultrasonic samples are filtered to estimate water height, percentage, and remaining space.</p></article>
+      <article class="card"><h3>Control locally</h3><p>AUTO mode starts at 10% and stops at 50%. Invalid readings, missing calibration, and a 15-minute runtime limit stop the pump.</p></article>
+      <article class="card"><h3>Connect when online</h3><p>The ESP32 posts readings and polls for commands. Wi-Fi supports monitoring and manual commands; local AUTO keeps running offline.</p></article>
+    </div>
+    <p class="notice"><strong>Wiring:</strong> The supplied diagram is a visual component reference. Follow the current firmware pin map in the connection guide where routes differ.</p>
+    <h2>Prototype photos</h2>
+    <img class="photo" src="assets/image-4.jpeg" alt="SmartFill ESP32 prototype with sensor wiring">
+    <footer><p>SmartFill 2.0 project guide. For GPIO mapping, power requirements, calibration, and safety, use the <a href="connection.html">connection guide</a>.</p></footer>
+  </main>
+</body>
+</html>
